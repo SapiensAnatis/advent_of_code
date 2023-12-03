@@ -105,4 +105,3 @@ fn get_min_cube_count(game: &str) -> HashMap<&str, i32> {
 
     cube_quantities
 }
-
