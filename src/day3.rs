@@ -91,19 +91,18 @@ fn part2() -> i32 {
 
     let num_regex = Regex::new(r"\d+").unwrap();
 
-    let it = input
-        .split('\n')
-        .enumerate()
-        .flat_map(|(line_no, line)|
-            num_regex
-                .find_iter(line)
-                .filter_map(|m| match get_gear(line_no, m.range(), &grid) {
-                    Some(gear_coord) => Some(GearResult {
-                        number: m.as_str().parse::<i32>().unwrap(),
-                        gear_coord,
-                    }),
-                    None => None,
-                }).collect::<Vec<GearResult>>());
+    let it = input.split('\n').enumerate().flat_map(|(line_no, line)| {
+        num_regex
+            .find_iter(line)
+            .filter_map(|m| match get_gear(line_no, m.range(), &grid) {
+                Some(gear_coord) => Some(GearResult {
+                    number: m.as_str().parse::<i32>().unwrap(),
+                    gear_coord,
+                }),
+                None => None,
+            })
+            .collect::<Vec<GearResult>>()
+    });
 
     let mut coord_hashmap = HashMap::new();
 
@@ -198,7 +197,6 @@ struct Coordinate {
     row: usize,
     col: usize,
 }
-
 
 #[derive(Debug)]
 struct GearResult {
