@@ -1,4 +1,4 @@
-use std::cmp::Reverse;
+use std::collections::HashMap;
 use std::fmt;
 use std::fmt::Formatter;
 
@@ -61,27 +61,26 @@ fn part2() -> u32 {
     let mut card_stack: Vec<Card> = parse_input();
     let mut card_count = 0;
 
-    card_stack.sort_by_key(|card| Reverse(card.number));
+    let mut card_values = HashMap::new();
 
     while let Some(new_card) = card_stack.pop() {
         println!("Processing {}", new_card);
 
         let win_count = win_count(&new_card);
+        let mut card_value = 1;
 
-        for i in 0..win_count {
-            let card_idx = usize::try_from(new_card.number).unwrap();
-            if let Some(extra_card) = card_source.get(card_idx + i) {
-                println!("Adding extra card {}", extra_card);
-                card_stack.push(extra_card.clone());
-            }
+        for i in 1..=win_count {
+            let won_card_no = new_card.number + i;
+            println!("Won card {}", won_card_no);
+            card_value += card_values.get(&won_card_no).unwrap_or(&1u32);
         }
 
-        card_stack.sort_by_key(|card| Reverse(card.number));
+        card_values.insert(new_card.number, card_value);
+        card_count += card_value;
 
-        card_count += 1;
+        println!("Calculated value {}", card_value);
+        println!("Hashmap: {:?}", card_values);
     }
-
-    card_stack.sort_by_key(|card| card.number);
 
     for card in card_stack {
         println!("{}", card)
@@ -116,9 +115,12 @@ fn parse_input() -> Vec<Card> {
     parse.collect::<Vec<Card>>()
 }
 
-fn win_count(card: &Card) -> usize {
-    card.obtained_numbers
-        .iter()
-        .filter(|n| card.winning_numbers.contains(n))
-        .count()
+fn win_count(card: &Card) -> u32 {
+    u32::try_from(
+        card.obtained_numbers
+            .iter()
+            .filter(|n| card.winning_numbers.contains(n))
+            .count(),
+    )
+    .unwrap()
 }
